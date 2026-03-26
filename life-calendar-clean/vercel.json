@@ -1,7 +1,4 @@
 {
-  "functions": {
-    "api/wallpaper.jsx": {
-      "runtime": "edge"
-    }
-  }
+  "buildCommand": "",
+  "outputDirectory": "public"
 }
