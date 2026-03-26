@@ -96,14 +96,14 @@ module.exports = async function handler(req, res) {
 
   const { totalDays, elapsed, remaining, pct, dateStr, label } = data;
 
-  // Snake grid params — life mode uses smaller segments to fit ~4160 weeks
+  // Snake grid params — life mode uses smaller, tighter segments to fit ~4160 weeks
   const isLife = mode === "life";
-  const seg = isLife ? 12 : 24;
-  const gap = isLife ? 3.5 : 6.9;
+  const seg = isLife ? 10 : 24;
+  const gap = isLife ? 2.5 : 6.9;
   const step = seg + gap;
-  const marginX = 84;
-  const startY = 700;
-  const snakeH = 3;
+  const marginX = isLife ? 60 : 84;
+  const startY = isLife ? 660 : 700;
+  const snakeH = isLife ? 2 : 3;
   const W = 1170;
 
   const acrossCols = Math.floor((W - marginX * 2 + gap) / step);
