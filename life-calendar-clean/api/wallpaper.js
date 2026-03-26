@@ -49,7 +49,7 @@ module.exports = async function handler(req, res) {
   const gap = 6.9;
   const step = seg + gap;
   const marginX = 84;
-  const startY = 198;
+  const startY = 700;
   const snakeH = 3;
   const W = 1170;
 
