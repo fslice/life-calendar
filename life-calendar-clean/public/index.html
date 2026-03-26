@@ -4,84 +4,463 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Birthday Countdown Wallpaper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --coral: #E8593C;
+      --coral-dark: #c94428;
+      --bg: #f5f2ed;
+      --bg-warm: #eee9e1;
+      --text: #1a1a1a;
+      --text-mid: #6b6560;
+      --text-light: #a39e98;
+      --white: #fffdf9;
+      --border: #e2ddd6;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: #f5f2ed; color: #1a1a1a; min-height: 100vh; display: flex; justify-content: center; padding: 60px 20px; }
-    .container { max-width: 480px; width: 100%; }
-    h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-    p.sub { color: #666; font-size: 15px; margin-bottom: 40px; line-height: 1.5; }
-    label { display: block; font-size: 13px; font-weight: 500; color: #666; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
-    input { width: 100%; padding: 14px 16px; font-size: 17px; border: 1.5px solid #ddd; border-radius: 10px; background: #fff; font-family: inherit; margin-bottom: 24px; }
-    input:focus { outline: none; border-color: #E8593C; }
-    button { width: 100%; padding: 16px; font-size: 17px; font-weight: 500; background: #E8593C; color: #fff; border: none; border-radius: 10px; cursor: pointer; }
-    button:hover { background: #d04e30; }
-    .url-box { margin-top: 32px; padding: 20px; background: #fff; border-radius: 10px; border: 1.5px solid #ddd; display: none; }
-    .url-box label { margin-bottom: 10px; }
-    .url-box code { display: block; font-size: 14px; word-break: break-all; color: #E8593C; background: #faf5f3; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
-    .steps { margin-top: 32px; display: none; }
-    .steps h2 { font-size: 18px; margin-bottom: 16px; }
-    .step { padding: 16px; background: #fff; border-radius: 10px; border: 1.5px solid #eee; margin-bottom: 12px; }
-    .step-num { font-size: 12px; font-weight: 600; color: #E8593C; letter-spacing: 1px; margin-bottom: 4px; }
-    .step p { font-size: 14px; line-height: 1.6; color: #444; }
-    .step strong { color: #1a1a1a; }
+
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Hero section */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 24px;
+      gap: 80px;
+    }
+
+    .hero-left {
+      max-width: 440px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--coral);
+      border: 1px solid var(--coral);
+      border-radius: 100px;
+      padding: 6px 16px;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 64px;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--coral);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-mid);
+      margin-bottom: 40px;
+      max-width: 360px;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 16px 18px;
+      font-size: 15px;
+      font-family: 'IBM Plex Mono', monospace;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(232, 89, 60, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--coral);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    .btn:hover { background: var(--coral-dark); }
+    .btn:active { transform: scale(0.985); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--coral);
+      border: 1.5px solid var(--coral);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(232, 89, 60, 0.06);
+    }
+
+    /* Phone mockup */
+    .hero-right {
+      flex-shrink: 0;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .phone-frame {
+      width: 260px;
+      height: 540px;
+      background: var(--white);
+      border-radius: 40px;
+      border: 6px solid #1a1a1a;
+      overflow: hidden;
+      box-shadow:
+        0 40px 80px rgba(0,0,0,0.08),
+        0 16px 32px rgba(0,0,0,0.04),
+        inset 0 0 0 2px rgba(255,255,255,0.4);
+      position: relative;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #1a1a1a;
+      border-radius: 0 0 20px 20px;
+      z-index: 2;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 52px;
+    }
+
+    .phone-time {
+      font-family: 'Instrument Serif', serif;
+      font-size: 52px;
+      color: var(--text);
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .phone-date {
+      font-size: 9px;
+      color: var(--text-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* Animated snake preview inside the phone */
+    .snake-preview {
+      width: 200px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 0 10px;
+    }
+
+    .snake-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 1.5px;
+      background: var(--border);
+      animation: dotFill 3s ease infinite;
+    }
+
+    .snake-dot.filled {
+      background: var(--coral);
+      animation: none;
+    }
+
+    /* Result section */
+    .result {
+      margin-top: 32px;
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .result-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .result-card label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 12px;
+    }
+
+    .result-url {
+      display: block;
+      font-size: 12px;
+      word-break: break-all;
+      color: var(--coral);
+      background: rgba(232, 89, 60, 0.05);
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      line-height: 1.7;
+      border: 1px solid rgba(232, 89, 60, 0.12);
+    }
+
+    /* Setup steps */
+    .setup {
+      margin-top: 40px;
+      display: none;
+      animation: fadeUp 0.4s 0.1s ease both;
+    }
+
+    .setup-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 24px;
+    }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .step:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--coral);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-content {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-mid);
+      padding-top: 5px;
+    }
+
+    .step-content strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 60px 24px;
+      font-size: 11px;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes dotFill {
+      0%, 100% { background: var(--border); }
+      50% { background: var(--coral); }
+    }
+
+    /* Responsive */
+    @media (max-width: 820px) {
+      .hero {
+        flex-direction: column-reverse;
+        text-align: center;
+        gap: 48px;
+        padding: 60px 24px;
+      }
+
+      h1 { font-size: 44px; }
+      .subtitle { margin-left: auto; margin-right: auto; }
+
+      .hero-right {
+        transform: scale(0.85);
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 36px; }
+      .phone-frame { width: 220px; height: 460px; }
+      .phone-time { font-size: 42px; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Birthday countdown</h1>
-    <p class="sub">Generate a daily wallpaper for your iPhone lock screen showing a snake progress bar counting down to your birthday.</p>
 
-    <label>Your birthday</label>
-    <input type="date" id="bday" value="1998-10-01">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="badge">iPhone Lock Screen</div>
+      <h1>Count every day<br>until your <em>birthday</em></h1>
+      <p class="subtitle">A wallpaper that updates itself. Enter your birthday, set up a one-time automation, and watch a snake-shaped progress bar fill in — one square per day.</p>
 
-    <button onclick="generate()">Generate my URL</button>
+      <div class="form-group">
+        <label>Your birthday</label>
+        <input type="date" id="bday" value="1998-10-01">
+      </div>
+      <button class="btn" onclick="generate()">Generate wallpaper URL</button>
 
-    <div class="url-box" id="urlBox">
-      <label>Your wallpaper URL</label>
-      <code id="urlCode"></code>
-      <button onclick="copyUrl()" id="copyBtn">Copy URL</button>
+      <div class="result" id="result">
+        <div class="result-card">
+          <label>Your personal URL</label>
+          <code class="result-url" id="urlCode"></code>
+          <button class="btn btn-secondary" onclick="copyUrl()" id="copyBtn">Copy URL</button>
+        </div>
+      </div>
+
+      <div class="setup" id="setup">
+        <h2 class="setup-title">Set up auto-update</h2>
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">Open the <strong>Shortcuts</strong> app on your iPhone.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">Go to <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>. Set to <strong>6:00 AM</strong>, repeat <strong>Daily</strong>, select <strong>Run Immediately</strong>.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">Tap <strong>New Blank Automation</strong>. Add <strong>"Get Contents of URL"</strong> and paste your wallpaper URL.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">Add a second action: <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Expand options and disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-content">That's it. Your lock screen updates every morning with a fresh countdown.</div>
+        </div>
+      </div>
     </div>
 
-    <div class="steps" id="steps">
-      <h2>Set up your iPhone</h2>
-      <div class="step">
-        <div class="step-num">STEP 1</div>
-        <p>Open the <strong>Shortcuts</strong> app on your iPhone.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 2</div>
-        <p>Go to the <strong>Automation</strong> tab, tap <strong>New Automation</strong>, select <strong>Time of Day</strong>, set it to <strong>6:00 AM</strong>, repeat <strong>Daily</strong>, and select <strong>Run Immediately</strong>.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 3</div>
-        <p>Tap <strong>New Blank Automation</strong>. Add the action <strong>"Get Contents of URL"</strong> and paste your wallpaper URL above.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 4</div>
-        <p>Add a second action: <strong>"Set Wallpaper Photo"</strong> and choose <strong>Lock Screen</strong>. Tap the arrow to expand options and disable both <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 5</div>
-        <p>Done! Your lock screen will update every morning with a fresh countdown.</p>
+    <div class="hero-right">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-time">9:41</div>
+          <div class="phone-date">Thursday, March 26</div>
+          <div class="snake-preview" id="snakePreview"></div>
+        </div>
       </div>
     </div>
   </div>
 
+  <div class="footer">Wallpaper regenerates every day &middot; Works with iPhone Shortcuts</div>
+
   <script>
+    // Generate snake preview dots in the phone mockup
+    (function() {
+      const container = document.getElementById('snakePreview');
+      const total = 365;
+      const filled = Math.floor(total * 0.48);
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'snake-dot' + (i < filled ? ' filled' : '');
+        if (i >= filled && i < filled + 8) {
+          dot.style.animationDelay = ((i - filled) * 0.15) + 's';
+        }
+        container.appendChild(dot);
+      }
+    })();
+
     function generate() {
       const bday = document.getElementById('bday').value;
       if (!bday) return;
       const base = window.location.origin;
       const url = `${base}/api/wallpaper?birthday=${bday}`;
       document.getElementById('urlCode').textContent = url;
-      document.getElementById('urlBox').style.display = 'block';
-      document.getElementById('steps').style.display = 'block';
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('setup').style.display = 'block';
+
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
     function copyUrl() {
       const url = document.getElementById('urlCode').textContent;
       navigator.clipboard.writeText(url);
-      document.getElementById('copyBtn').textContent = 'Copied!';
-      setTimeout(() => document.getElementById('copyBtn').textContent = 'Copy URL', 2000);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy URL', 2000);
     }
   </script>
 </body>
