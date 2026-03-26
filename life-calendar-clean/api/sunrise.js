@@ -96,17 +96,6 @@ function solarTimes(lat, lng, date) {
   };
 }
 
-function formatTime(minutesUTC, tzOffsetMinutes) {
-  let mins = minutesUTC + tzOffsetMinutes;
-  if (mins < 0) mins += 1440;
-  if (mins >= 1440) mins -= 1440;
-  const h = Math.floor(mins / 60);
-  const m = Math.round(mins % 60);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-  return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
-}
-
 // ── Sky gradient & phase logic ───────────────────────────────────────
 
 function hexToRgb(hex) {
@@ -279,7 +268,6 @@ module.exports = async function handler(req, res) {
   try {
     const lat = parseFloat(req.query.lat);
     const lng = parseFloat(req.query.lng);
-    const tzOffset = req.query.tz ? parseInt(req.query.tz) : 0; // tz offset in minutes
 
     if (isNaN(lat) || isNaN(lng)) {
       return res.status(400).json({ error: "Missing ?lat=XX&lng=YY" });
@@ -298,10 +286,6 @@ module.exports = async function handler(req, res) {
     const nowMinUTC = now.getUTCHours() * 60 + now.getUTCMinutes();
 
     const sky = getCurrentSky(nowMinUTC, sunTimes);
-
-    // Format sunrise/sunset times for display
-    const sunriseStr = sunTimes.sunrise != null ? formatTime(sunTimes.sunrise, tzOffset) : "--:--";
-    const sunsetStr = sunTimes.sunset != null ? formatTime(sunTimes.sunset, tzOffset) : "--:--";
 
     // Generate stars
     const stars = sky.stars ? generateStars(utcDate, 80) : [];
@@ -431,95 +415,6 @@ module.exports = async function handler(req, res) {
         },
       });
     }
-
-    // Bottom text: sunrise/sunset times
-    children.push({
-      type: "div",
-      props: {
-        style: {
-          position: "absolute",
-          bottom: 180,
-          left: 0,
-          right: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        },
-        children: [
-          {
-            type: "div",
-            props: {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                gap: 60,
-              },
-              children: [
-                {
-                  type: "div",
-                  props: {
-                    style: {
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    },
-                    children: [
-                      {
-                        type: "div",
-                        props: {
-                          style: { fontSize: 30, fontWeight: 400, color: "rgba(255,255,255,0.5)", fontFamily: "Mono", display: "flex" },
-                          children: "SUNRISE",
-                        },
-                      },
-                      {
-                        type: "div",
-                        props: {
-                          style: { fontSize: 48, fontWeight: 500, color: "rgba(255,255,255,0.85)", fontFamily: "Mono", marginTop: 8, display: "flex" },
-                          children: sunriseStr,
-                        },
-                      },
-                    ],
-                  },
-                },
-                {
-                  type: "div",
-                  props: {
-                    style: { fontSize: 36, color: "rgba(255,255,255,0.25)", fontFamily: "Mono", display: "flex" },
-                    children: "|",
-                  },
-                },
-                {
-                  type: "div",
-                  props: {
-                    style: {
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    },
-                    children: [
-                      {
-                        type: "div",
-                        props: {
-                          style: { fontSize: 30, fontWeight: 400, color: "rgba(255,255,255,0.5)", fontFamily: "Mono", display: "flex" },
-                          children: "SUNSET",
-                        },
-                      },
-                      {
-                        type: "div",
-                        props: {
-                          style: { fontSize: 48, fontWeight: 500, color: "rgba(255,255,255,0.85)", fontFamily: "Mono", marginTop: 8, display: "flex" },
-                          children: sunsetStr,
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    });
 
     const jsx = {
       type: "div",

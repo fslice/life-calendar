@@ -758,7 +758,6 @@
             <div class="phone-time" style="color: rgba(255,255,255,0.9);">9:41</div>
             <div class="phone-date" style="color: rgba(255,255,255,0.6);">Thursday, March 26</div>
             <div class="sun-circle" style="background: #FFFBE8; box-shadow: 0 0 40px 15px rgba(255,255,230,0.35);"></div>
-            <div class="sun-times">6:48 AM &nbsp;|&nbsp; 7:22 PM</div>
           </div>
         </div>
       </div>
@@ -891,8 +890,7 @@
       if (!lat || !lng) return;
 
       const base = window.location.origin;
-      const tz = -(new Date().getTimezoneOffset()); // offset in minutes ahead of UTC
-      const url = `${base}/api/sunrise?lat=${lat}&lng=${lng}&tz=${tz}`;
+      const url = `${base}/api/sunrise?lat=${lat}&lng=${lng}`;
 
       document.getElementById('sunriseUrlCode').textContent = url;
       document.getElementById('sunriseResult').style.display = 'block';
