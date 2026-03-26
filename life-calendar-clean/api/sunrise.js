@@ -132,10 +132,10 @@ const PHASES = {
     stars: true,
   },
   dawn: {
-    gradient: ["#7EAAC8", "#B8C8D8", "#D4B8B0", "#F0C8A8", "#FFF8EC"],
-    sunColor: "#FFF0D0",
+    gradient: ["#2D4A6E", "#8E6B7E", "#D4956E", "#F0BB82", "#FDE8C8"],
+    sunColor: "#FFD89E",
     moonColor: null,
-    glowColor: "rgba(255, 220, 160, 0.3)",
+    glowColor: "rgba(255, 190, 110, 0.35)",
     stars: false,
   },
   day: {
