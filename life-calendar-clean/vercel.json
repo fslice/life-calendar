@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/wallpaper.jsx": {
+      "runtime": "edge"
+    }
+  }
+}
