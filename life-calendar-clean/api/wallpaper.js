@@ -97,12 +97,13 @@ module.exports = async function handler(req, res) {
   const { totalDays, elapsed, remaining, pct, dateStr, label } = data;
 
   // Snake grid params (scaled 3x for 1170x2532 output)
+  const isLife = mode === "life";
   const seg = 24;
   const gap = 6.9;
   const step = seg + gap;
   const marginX = 84;
   const startY = 700;
-  const snakeH = 3;
+  const snakeH = isLife ? 2 : 3;
   const W = 1170;
 
   const acrossCols = Math.floor((W - marginX * 2 + gap) / step);
