@@ -3,9 +3,9 @@ const { Resvg } = require("@resvg/resvg-js");
 
 // Fetch fonts from Google Fonts CDN
 const FONT_MEDIUM_URL =
-  "https://fonts.gstatic.com/s/ibmplexmono/v19/-F6qfjptAgt5VM-kVkqdyU8n1iIq131nj-o.ttf";
+  "https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJ8lc.ttf";
 const FONT_REGULAR_URL =
-  "https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
+  "https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
 
 module.exports = async function handler(req, res) {
   try {
