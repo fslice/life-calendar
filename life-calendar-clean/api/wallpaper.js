@@ -44,14 +44,14 @@ module.exports = async function handler(req, res) {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const dateStr = `${monthNames[birthDate.getMonth()]} ${birthDate.getDate()}, ${nextBirthday.getFullYear()}`;
 
-  // Snake grid params
-  const seg = 8;
-  const gap = 2.3;
+  // Snake grid params (scaled 3x for 1170x2532 output)
+  const seg = 24;
+  const gap = 6.9;
   const step = seg + gap;
-  const marginX = 28;
-  const startY = 66;
+  const marginX = 84;
+  const startY = 198;
   const snakeH = 3;
-  const W = 390;
+  const W = 1170;
 
   const acrossCols = Math.floor((W - marginX * 2 + gap) / step);
 
@@ -87,7 +87,7 @@ module.exports = async function handler(req, res) {
     top: p.y,
     width: seg,
     height: seg,
-    borderRadius: 1.7,
+    borderRadius: 5,
     backgroundColor: i < elapsed ? "#E8593C" : "#e0dbd4",
   }));
 
@@ -121,7 +121,7 @@ module.exports = async function handler(req, res) {
           props: {
             style: {
               position: "absolute",
-              bottom: 50,
+              bottom: 150,
               left: 0,
               right: 0,
               display: "flex",
@@ -132,28 +132,28 @@ module.exports = async function handler(req, res) {
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 28, fontWeight: 500, color: "#1a1a1a", fontFamily: "Mono", display: "flex" },
+                  style: { fontSize: 84, fontWeight: 500, color: "#1a1a1a", fontFamily: "Mono", display: "flex" },
                   children: String(remaining),
                 },
               },
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 12, fontWeight: 400, color: "#999999", marginTop: 4, fontFamily: "Mono", display: "flex" },
+                  style: { fontSize: 36, fontWeight: 400, color: "#999999", marginTop: 12, fontFamily: "Mono", display: "flex" },
                   children: "days to go",
                 },
               },
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 11, fontWeight: 400, color: "#bbbbbb", marginTop: 6, fontFamily: "Mono", display: "flex" },
+                  style: { fontSize: 33, fontWeight: 400, color: "#bbbbbb", marginTop: 18, fontFamily: "Mono", display: "flex" },
                   children: String(pct) + "%",
                 },
               },
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 9, fontWeight: 400, color: "#cccccc", marginTop: 6, fontFamily: "Mono", display: "flex" },
+                  style: { fontSize: 27, fontWeight: 400, color: "#cccccc", marginTop: 18, fontFamily: "Mono", display: "flex" },
                   children: dateStr,
                 },
               },
