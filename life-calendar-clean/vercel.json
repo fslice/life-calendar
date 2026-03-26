@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/wallpaper.mjs": {
+      "maxDuration": 10,
+      "includeFiles": "fonts/**"
+    }
+  }
+}
