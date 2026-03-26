@@ -4,14 +4,11 @@ export const config = {
   runtime: "edge",
 };
 
-// Load fonts at module level
-const monoFontMedium = fetch(
-  new URL("../fonts/ibm-plex-mono-500.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
-
-const monoFontRegular = fetch(
-  new URL("../fonts/ibm-plex-mono-400.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
+// Fetch fonts from Google Fonts CDN at runtime
+const FONT_MEDIUM_URL =
+  "https://fonts.gstatic.com/s/ibmplexmono/v19/-F6qfjptAgt5VM-kVkqdyU8n1iIq131nj-o.ttf";
+const FONT_REGULAR_URL =
+  "https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
@@ -25,8 +22,8 @@ export default async function handler(req) {
   }
 
   const [monoMediumData, monoRegularData] = await Promise.all([
-    monoFontMedium,
-    monoFontRegular,
+    fetch(FONT_MEDIUM_URL).then((res) => res.arrayBuffer()),
+    fetch(FONT_REGULAR_URL).then((res) => res.arrayBuffer()),
   ]);
 
   const [year, month, day] = birthday.split("-").map(Number);
