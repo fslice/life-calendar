@@ -702,8 +702,8 @@
     <div class="hero">
       <div class="hero-left">
         <div class="badge" style="color: #D47058; border-color: #D47058;">iPhone Lock Screen</div>
-        <h1>A wallpaper that tracks the <em style="color: #D47058;">sun</em></h1>
-        <p class="subtitle">Your lock screen shifts with the sky — deep blues at night, warm peach at dawn, bright blue by day, fiery orange at dusk. Updates every hour, no effort.</p>
+        <h1>Your lock screen follows the <em style="color: #D47058;">sky</em></h1>
+        <p class="subtitle">Dark at night, warm at dawn, blue during the day, orange at sunset. Give it your location and it figures out the rest.</p>
 
         <button class="btn btn-location" onclick="detectLocation()">Use my current location</button>
 
@@ -730,23 +730,19 @@
           <h2 class="setup-title">Set up auto-update</h2>
           <div class="step">
             <div class="step-number" style="background: #D47058;">1</div>
-            <div class="step-content">Open the <strong>Shortcuts</strong> app on your iPhone.</div>
+            <div class="step-content">Open <strong>Shortcuts</strong> &rarr; <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>.</div>
           </div>
           <div class="step">
             <div class="step-number" style="background: #D47058;">2</div>
-            <div class="step-content">Go to <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>. Set to run <strong>every hour</strong>, select <strong>Run Immediately</strong>.</div>
+            <div class="step-content">Pick <strong>Sunrise</strong> or <strong>Sunset</strong> as the trigger. iOS lets you offset by up to 4 hours before or after. Create a few automations around each — e.g. sunrise -1hr, sunrise, sunrise +30min, sunset -30min, sunset, sunset +30min. These shift automatically with the seasons.</div>
           </div>
           <div class="step">
             <div class="step-number" style="background: #D47058;">3</div>
-            <div class="step-content">Tap <strong>New Blank Automation</strong>. Add <strong>"Get Contents of URL"</strong> and paste your wallpaper URL.</div>
+            <div class="step-content">For each automation: add <strong>"Get Contents of URL"</strong> with your wallpaper URL, then <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
           </div>
           <div class="step">
             <div class="step-number" style="background: #D47058;">4</div>
-            <div class="step-content">Add a second action: <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Expand options and disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
-          </div>
-          <div class="step">
-            <div class="step-number" style="background: #D47058;">5</div>
-            <div class="step-content">That's it. Your lock screen shifts with the sky throughout the day.</div>
+            <div class="step-content">Add a couple of fixed-time ones too (like 12pm and 3pm) to refresh during the day. That's it — your lock screen follows the sun year-round.</div>
           </div>
         </div>
       </div>
@@ -754,10 +750,10 @@
       <div class="hero-right">
         <div class="phone-frame">
           <div class="phone-notch"></div>
-          <div class="sunrise-phone-screen" id="sunrisePhoneScreen" style="background: linear-gradient(to bottom, #4A90C4, #7AB4E0, #E4F0FA);">
+          <div class="sunrise-phone-screen" id="sunrisePhoneScreen" style="background: linear-gradient(to bottom, #1E2852, #6E3B6A, #B8506A, #E89848);">
             <div class="phone-time" style="color: rgba(255,255,255,0.9);">9:41</div>
             <div class="phone-date" style="color: rgba(255,255,255,0.6);">Thursday, March 26</div>
-            <div class="sun-circle" style="background: #FFFBE8; box-shadow: 0 0 40px 15px rgba(255,255,230,0.35);"></div>
+            <div class="sun-circle" style="background: #F0A050; box-shadow: 0 0 40px 15px rgba(240,140,60,0.3);"></div>
           </div>
         </div>
       </div>
@@ -838,10 +834,10 @@
 
     // ── Sunrise phone preview animation ──
     const skyPhases = [
-      { bg: 'linear-gradient(to bottom, #4A90C4, #7AB4E0, #E4F0FA)', sunBg: '#FFFBE8', sunShadow: '0 0 40px 15px rgba(255,255,230,0.35)', timeColor: 'rgba(255,255,255,0.9)' },
-      { bg: 'linear-gradient(to bottom, #1E2852, #6E3B6A, #E89848)', sunBg: '#F0A050', sunShadow: '0 0 40px 15px rgba(240,140,60,0.3)', timeColor: 'rgba(255,255,255,0.9)' },
-      { bg: 'linear-gradient(to bottom, #0B0E1A, #141C36, #1A2444)', sunBg: '#E8E4D4', sunShadow: '0 0 30px 10px rgba(232,228,212,0.15)', timeColor: 'rgba(255,255,255,0.7)' },
-      { bg: 'linear-gradient(to bottom, #7EAAC8, #D4B8B0, #FFF8EC)', sunBg: '#FFF0D0', sunShadow: '0 0 40px 15px rgba(255,220,160,0.3)', timeColor: 'rgba(255,255,255,0.9)' },
+      { bg: 'linear-gradient(to bottom, #1E2852, #6E3B6A, #B8506A, #E89848)', sunBg: '#F0A050', sunShadow: '0 0 40px 15px rgba(240,140,60,0.3)', timeColor: 'rgba(255,255,255,0.9)' },
+      { bg: 'linear-gradient(to bottom, #0B0E1A, #0F1428, #141C36, #1A2444)', sunBg: '#E8E4D4', sunShadow: '0 0 30px 10px rgba(232,228,212,0.15)', timeColor: 'rgba(255,255,255,0.7)' },
+      { bg: 'linear-gradient(to bottom, #2D4A6E, #8E6B7E, #D4956E, #FDE8C8)', sunBg: '#FFD89E', sunShadow: '0 0 40px 15px rgba(255,190,110,0.35)', timeColor: 'rgba(255,255,255,0.9)' },
+      { bg: 'linear-gradient(to bottom, #4A90C4, #7AB4E0, #C8E2F4, #E4F0FA)', sunBg: '#FFFBE8', sunShadow: '0 0 40px 15px rgba(255,255,230,0.35)', timeColor: 'rgba(255,255,255,0.9)' },
     ];
     let skyIndex = 0;
 
