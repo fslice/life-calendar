@@ -98,8 +98,8 @@ module.exports = async function handler(req, res) {
 
   // Snake grid params (scaled 3x for 1170x2532 output)
   const isLife = mode === "life";
-  const seg = 24;
-  const gap = 6.9;
+  const seg = isLife ? 12 : 24;
+  const gap = isLife ? 3.5 : 6.9;
   const step = seg + gap;
   const marginX = 84;
   const startY = 700;
