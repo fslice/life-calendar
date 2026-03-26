@@ -113,10 +113,12 @@ export default async function handler(req) {
           fontFamily: "Mono",
         }}
       >
-        {/* Snake blocks */}
-        {blocks.map((style, i) => (
-          <div key={i} style={style} />
-        ))}
+        {/* Snake blocks — wrapped so Satori treats them as one layer */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex" }}>
+          {blocks.map((style, i) => (
+            <div key={i} style={style} />
+          ))}
+        </div>
 
         {/* Bottom text */}
         <div
@@ -136,9 +138,10 @@ export default async function handler(req) {
               fontWeight: 500,
               color: "#1a1a1a",
               fontFamily: "Mono",
+              display: "flex",
             }}
           >
-            {remaining}
+            {String(remaining)}
           </div>
           <div
             style={{
@@ -147,6 +150,7 @@ export default async function handler(req) {
               color: "#999999",
               marginTop: 4,
               fontFamily: "Mono",
+              display: "flex",
             }}
           >
             days to go
@@ -158,9 +162,10 @@ export default async function handler(req) {
               color: "#bbbbbb",
               marginTop: 6,
               fontFamily: "Mono",
+              display: "flex",
             }}
           >
-            {pct}%
+            {String(pct)}%
           </div>
           <div
             style={{
@@ -169,6 +174,7 @@ export default async function handler(req) {
               color: "#cccccc",
               marginTop: 6,
               fontFamily: "Mono",
+              display: "flex",
             }}
           >
             {dateStr}
