@@ -42,12 +42,54 @@
       z-index: 100;
     }
 
+    /* Top-level product toggle */
+    .product-nav {
+      display: flex;
+      justify-content: center;
+      padding: 24px 24px 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .product-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-warm);
+      border-radius: 14px;
+      padding: 5px;
+    }
+
+    .product-toggle button {
+      padding: 10px 24px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .product-toggle button.active {
+      background: var(--white);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .product-toggle button:hover:not(.active) {
+      color: var(--text-mid);
+    }
+
     /* Hero section */
     .hero {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      min-height: calc(100vh - 60px);
       padding: 40px 24px;
       gap: 80px;
     }
@@ -198,6 +240,24 @@
       background: rgba(232, 89, 60, 0.06);
     }
 
+    /* Location button */
+    .btn-location {
+      background: transparent;
+      color: var(--text-mid);
+      border: 1.5px dashed var(--border);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: none;
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .btn-location:hover {
+      background: rgba(0,0,0,0.02);
+      border-color: var(--text-light);
+      color: var(--text);
+    }
+
     /* Phone mockup */
     .hero-right {
       flex-shrink: 0;
@@ -277,6 +337,36 @@
     .snake-dot.filled {
       background: var(--coral);
       animation: none;
+    }
+
+    /* Sunrise phone preview */
+    .sunrise-phone-screen {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background 3s ease;
+    }
+
+    .sunrise-phone-screen .sun-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      transition: all 3s ease;
+      margin-bottom: 40px;
+    }
+
+    .sunrise-phone-screen .sun-times {
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+      text-align: center;
+      position: absolute;
+      bottom: 60px;
     }
 
     /* Result section */
@@ -376,6 +466,9 @@
       letter-spacing: 0.5px;
     }
 
+    /* Section visibility */
+    .section-hidden { display: none !important; }
+
     /* Animations */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -385,6 +478,14 @@
     @keyframes dotFill {
       0%, 100% { background: var(--border); }
       50% { background: var(--coral); }
+    }
+
+    @keyframes skyShift {
+      0%   { background: linear-gradient(to bottom, #0B0E1A, #1A2444); }
+      25%  { background: linear-gradient(to bottom, #7EAAC8, #D4B8B0, #FFF8EC); }
+      50%  { background: linear-gradient(to bottom, #4A90C4, #7AB4E0, #E4F0FA); }
+      75%  { background: linear-gradient(to bottom, #1E2852, #6E3B6A, #E89848); }
+      100% { background: linear-gradient(to bottom, #0B0E1A, #1A2444); }
     }
 
     /* Responsive — tablet */
@@ -404,7 +505,7 @@
         transform: scale(0.85);
       }
 
-      .form-group, .mode-toggle, .btn, .form-hint {
+      .form-group, .mode-toggle, .btn, .form-hint, .btn-location {
         text-align: left;
       }
     }
@@ -414,6 +515,15 @@
       .hero {
         padding: 32px 20px;
         gap: 32px;
+      }
+
+      .product-nav {
+        padding: 16px 20px 0;
+      }
+
+      .product-toggle button {
+        padding: 9px 16px;
+        font-size: 10px;
       }
 
       .badge {
@@ -512,76 +622,174 @@
 </head>
 <body>
 
-  <div class="hero">
-    <div class="hero-left">
-      <div class="badge">iPhone Lock Screen</div>
-      <h1>A wallpaper that <em>counts down</em> for you</h1>
-      <p class="subtitle">Pick any date — your birthday, a goal, a deadline — and get a lock screen that updates itself daily with a snake-shaped progress bar. One square per day, zero effort.</p>
-
-      <div class="mode-toggle" id="modeToggle">
-        <button class="active" data-mode="birthday">Birthday</button>
-        <button data-mode="year">Year</button>
-        <button data-mode="life">Life</button>
-      </div>
-
-      <div id="dateGroup" class="form-group">
-        <label id="dateLabel">Your birthday</label>
-        <input type="date" id="bday" value="1998-10-01">
-      </div>
-      <p class="form-hint" id="formHint" style="display:none"></p>
-      <button class="btn" onclick="generate()">Generate wallpaper URL</button>
-
-      <div class="result" id="result">
-        <div class="result-card">
-          <label>Your personal URL</label>
-          <code class="result-url" id="urlCode"></code>
-          <button class="btn btn-secondary" onclick="copyUrl()" id="copyBtn">Copy URL</button>
-        </div>
-      </div>
-
-      <div class="setup" id="setup">
-        <h2 class="setup-title">Set up auto-update</h2>
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">Open the <strong>Shortcuts</strong> app on your iPhone.</div>
-        </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">Go to <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>. Set to <strong>6:00 AM</strong>, repeat <strong>Daily</strong>, select <strong>Run Immediately</strong>.</div>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">Tap <strong>New Blank Automation</strong>. Add <strong>"Get Contents of URL"</strong> and paste your wallpaper URL.</div>
-        </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-content">Add a second action: <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Expand options and disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
-        </div>
-        <div class="step">
-          <div class="step-number">5</div>
-          <div class="step-content">That's it. Your lock screen updates every morning with a fresh countdown.</div>
-        </div>
-      </div>
+  <!-- Top-level product toggle -->
+  <nav class="product-nav">
+    <div class="product-toggle" id="productToggle">
+      <button class="active" data-product="calendar">Calendar</button>
+      <button data-product="sunrise">Sunrise</button>
     </div>
+  </nav>
 
-    <div class="hero-right">
-      <div class="phone-frame">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="phone-time">9:41</div>
-          <div class="phone-date">Thursday, March 26</div>
-          <div class="snake-preview" id="snakePreview"></div>
+  <!-- ═══════════════════════ CALENDAR SECTION ═══════════════════════ -->
+  <div id="calendarSection">
+    <div class="hero">
+      <div class="hero-left">
+        <div class="badge">iPhone Lock Screen</div>
+        <h1>A wallpaper that <em>counts down</em> for you</h1>
+        <p class="subtitle">Pick any date — your birthday, a goal, a deadline — and get a lock screen that updates itself daily with a snake-shaped progress bar. One square per day, zero effort.</p>
+
+        <div class="mode-toggle" id="modeToggle">
+          <button class="active" data-mode="birthday">Birthday</button>
+          <button data-mode="year">Year</button>
+          <button data-mode="life">Life</button>
+        </div>
+
+        <div id="dateGroup" class="form-group">
+          <label id="dateLabel">Your birthday</label>
+          <input type="date" id="bday" value="1998-10-01">
+        </div>
+        <p class="form-hint" id="formHint" style="display:none"></p>
+        <button class="btn" onclick="generateCalendar()">Generate wallpaper URL</button>
+
+        <div class="result" id="calendarResult">
+          <div class="result-card">
+            <label>Your personal URL</label>
+            <code class="result-url" id="calendarUrlCode"></code>
+            <button class="btn btn-secondary" onclick="copyUrl('calendarUrlCode', this)">Copy URL</button>
+          </div>
+        </div>
+
+        <div class="setup" id="calendarSetup">
+          <h2 class="setup-title">Set up auto-update</h2>
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">Open the <strong>Shortcuts</strong> app on your iPhone.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">Go to <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>. Set to <strong>6:00 AM</strong>, repeat <strong>Daily</strong>, select <strong>Run Immediately</strong>.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">Tap <strong>New Blank Automation</strong>. Add <strong>"Get Contents of URL"</strong> and paste your wallpaper URL.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">Add a second action: <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Expand options and disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">That's it. Your lock screen updates every morning with a fresh countdown.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-time">9:41</div>
+            <div class="phone-date">Thursday, March 26</div>
+            <div class="snake-preview" id="snakePreview"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">Wallpaper regenerates every day &middot; Works with iPhone Shortcuts</div>
+  <!-- ═══════════════════════ SUNRISE SECTION ═══════════════════════ -->
+  <div id="sunriseSection" class="section-hidden">
+    <div class="hero">
+      <div class="hero-left">
+        <div class="badge" style="color: #D47058; border-color: #D47058;">iPhone Lock Screen</div>
+        <h1>A wallpaper that tracks the <em style="color: #D47058;">sun</em></h1>
+        <p class="subtitle">Your lock screen shifts with the sky — deep blues at night, warm peach at dawn, bright blue by day, fiery orange at dusk. Updates every hour, no effort.</p>
+
+        <button class="btn btn-location" onclick="detectLocation()">Use my current location</button>
+
+        <div class="form-group">
+          <label>Latitude</label>
+          <input type="number" step="any" id="sunLat" placeholder="40.7128" value="">
+        </div>
+        <div class="form-group">
+          <label>Longitude</label>
+          <input type="number" step="any" id="sunLng" placeholder="-74.0060" value="">
+        </div>
+        <p class="form-hint" style="display:block">Tip: use the button above or find your coordinates on Google Maps.</p>
+        <button class="btn" style="background: #D47058;" onclick="generateSunrise()">Generate wallpaper URL</button>
+
+        <div class="result" id="sunriseResult">
+          <div class="result-card">
+            <label>Your personal URL</label>
+            <code class="result-url" id="sunriseUrlCode"></code>
+            <button class="btn btn-secondary" onclick="copyUrl('sunriseUrlCode', this)">Copy URL</button>
+          </div>
+        </div>
+
+        <div class="setup" id="sunriseSetup">
+          <h2 class="setup-title">Set up auto-update</h2>
+          <div class="step">
+            <div class="step-number" style="background: #D47058;">1</div>
+            <div class="step-content">Open the <strong>Shortcuts</strong> app on your iPhone.</div>
+          </div>
+          <div class="step">
+            <div class="step-number" style="background: #D47058;">2</div>
+            <div class="step-content">Go to <strong>Automation</strong> &rarr; <strong>New Automation</strong> &rarr; <strong>Time of Day</strong>. Set to run <strong>every hour</strong>, select <strong>Run Immediately</strong>.</div>
+          </div>
+          <div class="step">
+            <div class="step-number" style="background: #D47058;">3</div>
+            <div class="step-content">Tap <strong>New Blank Automation</strong>. Add <strong>"Get Contents of URL"</strong> and paste your wallpaper URL.</div>
+          </div>
+          <div class="step">
+            <div class="step-number" style="background: #D47058;">4</div>
+            <div class="step-content">Add a second action: <strong>"Set Wallpaper Photo"</strong> &rarr; <strong>Lock Screen</strong>. Expand options and disable <strong>"Crop to Subject"</strong> and <strong>"Show Preview"</strong>.</div>
+          </div>
+          <div class="step">
+            <div class="step-number" style="background: #D47058;">5</div>
+            <div class="step-content">That's it. Your lock screen shifts with the sky throughout the day.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="sunrise-phone-screen" id="sunrisePhoneScreen" style="background: linear-gradient(to bottom, #4A90C4, #7AB4E0, #E4F0FA);">
+            <div class="phone-time" style="color: rgba(255,255,255,0.9);">9:41</div>
+            <div class="phone-date" style="color: rgba(255,255,255,0.6);">Thursday, March 26</div>
+            <div class="sun-circle" style="background: #FFFBE8; box-shadow: 0 0 40px 15px rgba(255,255,230,0.35);"></div>
+            <div class="sun-times">6:48 AM &nbsp;|&nbsp; 7:22 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Wallpaper regenerates automatically &middot; Works with iPhone Shortcuts</div>
 
   <script>
     let currentMode = 'birthday';
+    let currentProduct = 'calendar';
 
-    // Mode toggle
+    // ── Product toggle ──
+    document.getElementById('productToggle').addEventListener('click', function(e) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const product = btn.dataset.product;
+      if (product === currentProduct) return;
+
+      currentProduct = product;
+      this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.getElementById('calendarSection').classList.toggle('section-hidden', product !== 'calendar');
+      document.getElementById('sunriseSection').classList.toggle('section-hidden', product !== 'sunrise');
+
+      // Start the sunrise phone animation when switching to sunrise
+      if (product === 'sunrise') startSunrisePreviewAnimation();
+    });
+
+    // ── Calendar mode toggle ──
     document.getElementById('modeToggle').addEventListener('click', function(e) {
       const btn = e.target.closest('button');
       if (!btn) return;
@@ -610,12 +818,11 @@
         hint.style.display = 'none';
       }
 
-      // Hide previous results
-      document.getElementById('result').style.display = 'none';
-      document.getElementById('setup').style.display = 'none';
+      document.getElementById('calendarResult').style.display = 'none';
+      document.getElementById('calendarSetup').style.display = 'none';
     });
 
-    // Generate snake preview dots in the phone mockup
+    // ── Snake preview dots ──
     (function() {
       const container = document.getElementById('snakePreview');
       const total = 365;
@@ -630,7 +837,33 @@
       }
     })();
 
-    function generate() {
+    // ── Sunrise phone preview animation ──
+    const skyPhases = [
+      { bg: 'linear-gradient(to bottom, #4A90C4, #7AB4E0, #E4F0FA)', sunBg: '#FFFBE8', sunShadow: '0 0 40px 15px rgba(255,255,230,0.35)', timeColor: 'rgba(255,255,255,0.9)' },
+      { bg: 'linear-gradient(to bottom, #1E2852, #6E3B6A, #E89848)', sunBg: '#F0A050', sunShadow: '0 0 40px 15px rgba(240,140,60,0.3)', timeColor: 'rgba(255,255,255,0.9)' },
+      { bg: 'linear-gradient(to bottom, #0B0E1A, #141C36, #1A2444)', sunBg: '#E8E4D4', sunShadow: '0 0 30px 10px rgba(232,228,212,0.15)', timeColor: 'rgba(255,255,255,0.7)' },
+      { bg: 'linear-gradient(to bottom, #7EAAC8, #D4B8B0, #FFF8EC)', sunBg: '#FFF0D0', sunShadow: '0 0 40px 15px rgba(255,220,160,0.3)', timeColor: 'rgba(255,255,255,0.9)' },
+    ];
+    let skyIndex = 0;
+
+    function startSunrisePreviewAnimation() {
+      cycleSunrisePreview();
+    }
+
+    function cycleSunrisePreview() {
+      const screen = document.getElementById('sunrisePhoneScreen');
+      if (!screen) return;
+      const phase = skyPhases[skyIndex];
+      screen.style.background = phase.bg;
+      screen.querySelector('.sun-circle').style.background = phase.sunBg;
+      screen.querySelector('.sun-circle').style.boxShadow = phase.sunShadow;
+      screen.querySelector('.phone-time').style.color = phase.timeColor;
+      skyIndex = (skyIndex + 1) % skyPhases.length;
+      setTimeout(cycleSunrisePreview, 3000);
+    }
+
+    // ── Generate functions ──
+    function generateCalendar() {
       const base = window.location.origin;
       let url;
 
@@ -646,19 +879,49 @@
         url = `${base}/api/wallpaper?mode=birthday&birthday=${bday}`;
       }
 
-      document.getElementById('urlCode').textContent = url;
-      document.getElementById('result').style.display = 'block';
-      document.getElementById('setup').style.display = 'block';
-
-      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('calendarUrlCode').textContent = url;
+      document.getElementById('calendarResult').style.display = 'block';
+      document.getElementById('calendarSetup').style.display = 'block';
+      document.getElementById('calendarResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    function copyUrl() {
-      const url = document.getElementById('urlCode').textContent;
+    function generateSunrise() {
+      const lat = document.getElementById('sunLat').value;
+      const lng = document.getElementById('sunLng').value;
+      if (!lat || !lng) return;
+
+      const base = window.location.origin;
+      const tz = -(new Date().getTimezoneOffset()); // offset in minutes ahead of UTC
+      const url = `${base}/api/sunrise?lat=${lat}&lng=${lng}&tz=${tz}`;
+
+      document.getElementById('sunriseUrlCode').textContent = url;
+      document.getElementById('sunriseResult').style.display = 'block';
+      document.getElementById('sunriseSetup').style.display = 'block';
+      document.getElementById('sunriseResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function detectLocation() {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          document.getElementById('sunLat').value = pos.coords.latitude.toFixed(4);
+          document.getElementById('sunLng').value = pos.coords.longitude.toFixed(4);
+        },
+        function(err) {
+          alert('Could not detect location. Please enter coordinates manually.');
+        }
+      );
+    }
+
+    function copyUrl(elementId, btn) {
+      const url = document.getElementById(elementId).textContent;
       navigator.clipboard.writeText(url);
-      const btn = document.getElementById('copyBtn');
+      const originalText = btn.textContent;
       btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy URL', 2000);
+      setTimeout(() => btn.textContent = originalText, 2000);
     }
   </script>
 </body>

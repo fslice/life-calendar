@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/wallpaper", "destination": "/api/wallpaper" }
+    { "source": "/api/wallpaper", "destination": "/api/wallpaper" },
+    { "source": "/api/sunrise", "destination": "/api/sunrise" }
   ]
 }
