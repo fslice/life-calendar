@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birthday Countdown Wallpaper</title>
+  <title>Countdown Wallpaper</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
@@ -121,6 +121,49 @@
       outline: none;
       border-color: var(--coral);
       box-shadow: 0 0 0 3px rgba(232, 89, 60, 0.1);
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-warm);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .mode-toggle button {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.5px;
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-toggle button.active {
+      background: var(--white);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .mode-toggle button:hover:not(.active) {
+      color: var(--text-mid);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-top: -12px;
+      margin-bottom: 16px;
+      line-height: 1.5;
     }
 
     .btn {
@@ -374,10 +417,17 @@
       <h1>A wallpaper that <em>counts down</em> for you</h1>
       <p class="subtitle">Pick any date — your birthday, a goal, a deadline — and get a lock screen that updates itself daily with a snake-shaped progress bar. One square per day, zero effort.</p>
 
-      <div class="form-group">
-        <label>Your date</label>
+      <div class="mode-toggle" id="modeToggle">
+        <button class="active" data-mode="birthday">Birthday</button>
+        <button data-mode="year">Year</button>
+        <button data-mode="life">Life</button>
+      </div>
+
+      <div id="dateGroup" class="form-group">
+        <label id="dateLabel">Your birthday</label>
         <input type="date" id="bday" value="1998-10-01">
       </div>
+      <p class="form-hint" id="formHint" style="display:none"></p>
       <button class="btn" onclick="generate()">Generate wallpaper URL</button>
 
       <div class="result" id="result">
@@ -428,6 +478,42 @@
   <div class="footer">Wallpaper regenerates every day &middot; Works with iPhone Shortcuts</div>
 
   <script>
+    let currentMode = 'birthday';
+
+    // Mode toggle
+    document.getElementById('modeToggle').addEventListener('click', function(e) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const mode = btn.dataset.mode;
+      currentMode = mode;
+
+      this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const dateGroup = document.getElementById('dateGroup');
+      const dateLabel = document.getElementById('dateLabel');
+      const hint = document.getElementById('formHint');
+
+      if (mode === 'year') {
+        dateGroup.style.display = 'none';
+        hint.style.display = 'block';
+        hint.textContent = 'No date needed — tracks progress through the current year.';
+      } else if (mode === 'life') {
+        dateGroup.style.display = 'block';
+        dateLabel.textContent = 'Your birthday';
+        hint.style.display = 'block';
+        hint.textContent = 'Shows weeks lived out of 80 years. Each square = one week.';
+      } else {
+        dateGroup.style.display = 'block';
+        dateLabel.textContent = 'Your birthday';
+        hint.style.display = 'none';
+      }
+
+      // Hide previous results
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('setup').style.display = 'none';
+    });
+
     // Generate snake preview dots in the phone mockup
     (function() {
       const container = document.getElementById('snakePreview');
@@ -444,10 +530,21 @@
     })();
 
     function generate() {
-      const bday = document.getElementById('bday').value;
-      if (!bday) return;
       const base = window.location.origin;
-      const url = `${base}/api/wallpaper?birthday=${bday}`;
+      let url;
+
+      if (currentMode === 'year') {
+        url = `${base}/api/wallpaper?mode=year`;
+      } else if (currentMode === 'life') {
+        const bday = document.getElementById('bday').value;
+        if (!bday) return;
+        url = `${base}/api/wallpaper?mode=life&birthday=${bday}`;
+      } else {
+        const bday = document.getElementById('bday').value;
+        if (!bday) return;
+        url = `${base}/api/wallpaper?mode=birthday&birthday=${bday}`;
+      }
+
       document.getElementById('urlCode').textContent = url;
       document.getElementById('result').style.display = 'block';
       document.getElementById('setup').style.display = 'block';

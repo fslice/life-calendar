@@ -7,19 +7,10 @@ const FONT_MEDIUM_URL =
 const FONT_REGULAR_URL =
   "https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
 
-module.exports = async function handler(req, res) {
-  try {
-  const birthday = req.query.birthday;
+const msPerDay = 86400000;
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  if (!birthday) {
-    return res.status(400).json({ error: "Missing ?birthday=YYYY-MM-DD" });
-  }
-
-  const [monoMediumData, monoRegularData] = await Promise.all([
-    fetch(FONT_MEDIUM_URL).then((r) => r.arrayBuffer()),
-    fetch(FONT_REGULAR_URL).then((r) => r.arrayBuffer()),
-  ]);
-
+function calcBirthday(birthday) {
   const [year, month, day] = birthday.split("-").map(Number);
   const birthDate = new Date(year, month - 1, day);
   const now = new Date();
@@ -35,18 +26,80 @@ module.exports = async function handler(req, res) {
     lastBirthday = new Date(today.getFullYear() - 1, birthDate.getMonth(), birthDate.getDate());
   }
 
-  const msPerDay = 86400000;
   const totalDays = Math.round((nextBirthday - lastBirthday) / msPerDay);
   const elapsed = Math.round((today - lastBirthday) / msPerDay);
   const remaining = totalDays - elapsed;
   const pct = ((elapsed / totalDays) * 100).toFixed(1);
-
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const dateStr = `${monthNames[birthDate.getMonth()]} ${birthDate.getDate()}, ${nextBirthday.getFullYear()}`;
 
-  // Snake grid params (scaled 3x for 1170x2532 output)
-  const seg = 24;
-  const gap = 6.9;
+  return { totalDays, elapsed, remaining, pct, dateStr, label: "days to go" };
+}
+
+function calcYear() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+  const endOfYear = new Date(today.getFullYear() + 1, 0, 1);
+
+  const totalDays = Math.round((endOfYear - startOfYear) / msPerDay);
+  const elapsed = Math.round((today - startOfYear) / msPerDay);
+  const remaining = totalDays - elapsed;
+  const pct = ((elapsed / totalDays) * 100).toFixed(1);
+  const dateStr = `Dec 31, ${today.getFullYear()}`;
+
+  return { totalDays, elapsed, remaining, pct, dateStr, label: "days left this year" };
+}
+
+function calcLife(birthday, lifespan) {
+  const maxYears = lifespan || 80;
+  const [year, month, day] = birthday.split("-").map(Number);
+  const birthDate = new Date(year, month - 1, day);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const totalWeeks = maxYears * 52;
+  const msPerWeek = msPerDay * 7;
+  const weeksLived = Math.floor((today - birthDate) / msPerWeek);
+  const elapsed = Math.min(weeksLived, totalWeeks);
+  const remaining = Math.max(totalWeeks - elapsed, 0);
+  const pct = ((elapsed / totalWeeks) * 100).toFixed(1);
+
+  const age = Math.floor((today - birthDate) / (msPerDay * 365.25));
+  const dateStr = `${age} of ${maxYears} years`;
+
+  return { totalDays: totalWeeks, elapsed, remaining, pct, dateStr, label: "weeks to go" };
+}
+
+module.exports = async function handler(req, res) {
+  try {
+  const mode = req.query.mode || "birthday";
+  const birthday = req.query.birthday;
+
+  if ((mode === "birthday" || mode === "life") && !birthday) {
+    return res.status(400).json({ error: "Missing ?birthday=YYYY-MM-DD" });
+  }
+
+  const [monoMediumData, monoRegularData] = await Promise.all([
+    fetch(FONT_MEDIUM_URL).then((r) => r.arrayBuffer()),
+    fetch(FONT_REGULAR_URL).then((r) => r.arrayBuffer()),
+  ]);
+
+  let data;
+  if (mode === "year") {
+    data = calcYear();
+  } else if (mode === "life") {
+    const lifespan = req.query.lifespan ? parseInt(req.query.lifespan) : 80;
+    data = calcLife(birthday, lifespan);
+  } else {
+    data = calcBirthday(birthday);
+  }
+
+  const { totalDays, elapsed, remaining, pct, dateStr, label } = data;
+
+  // Snake grid params — life mode uses smaller segments to fit ~4160 weeks
+  const isLife = mode === "life";
+  const seg = isLife ? 12 : 24;
+  const gap = isLife ? 3.5 : 6.9;
   const step = seg + gap;
   const marginX = 84;
   const startY = 700;
@@ -87,7 +140,7 @@ module.exports = async function handler(req, res) {
     top: p.y,
     width: seg,
     height: seg,
-    borderRadius: 5,
+    borderRadius: isLife ? 3 : 5,
     backgroundColor: i < elapsed ? "#E8593C" : "#e0dbd4",
   }));
 
@@ -140,7 +193,7 @@ module.exports = async function handler(req, res) {
                 type: "div",
                 props: {
                   style: { fontSize: 36, fontWeight: 400, color: "#999999", marginTop: 12, fontFamily: "Mono", display: "flex" },
-                  children: "days to go",
+                  children: label,
                 },
               },
               {
