@@ -1,5 +1,5 @@
-import satori from "satori";
-import { Resvg } from "@resvg/resvg-js";
+const satori = require("satori").default || require("satori");
+const { Resvg } = require("@resvg/resvg-js");
 
 // Fetch fonts from Google Fonts CDN
 const FONT_MEDIUM_URL =
@@ -7,7 +7,8 @@ const FONT_MEDIUM_URL =
 const FONT_REGULAR_URL =
   "https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+  try {
   const birthday = req.query.birthday;
 
   if (!birthday) {
@@ -191,4 +192,8 @@ export default async function handler(req, res) {
   res.setHeader("Content-Type", "image/png");
   res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=3600");
   return res.send(pngBuffer);
-}
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message, stack: err.stack });
+  }
+};

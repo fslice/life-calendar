@@ -2,7 +2,6 @@
   "name": "life-calendar",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "dependencies": {
     "satori": "^0.10.0",
     "@resvg/resvg-js": "^2.6.0"
