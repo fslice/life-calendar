@@ -1,29 +1,22 @@
-import { ImageResponse } from "@vercel/og";
+import satori from "satori";
+import { Resvg } from "@resvg/resvg-js";
 
-export const config = {
-  runtime: "edge",
-};
-
-// Fetch fonts from Google Fonts CDN at runtime
+// Fetch fonts from Google Fonts CDN
 const FONT_MEDIUM_URL =
   "https://fonts.gstatic.com/s/ibmplexmono/v19/-F6qfjptAgt5VM-kVkqdyU8n1iIq131nj-o.ttf";
 const FONT_REGULAR_URL =
   "https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n5ig.ttf";
 
-export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
-  const birthday = searchParams.get("birthday");
+export default async function handler(req, res) {
+  const birthday = req.query.birthday;
 
   if (!birthday) {
-    return new Response(JSON.stringify({ error: "Missing ?birthday=YYYY-MM-DD" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(400).json({ error: "Missing ?birthday=YYYY-MM-DD" });
   }
 
   const [monoMediumData, monoRegularData] = await Promise.all([
-    fetch(FONT_MEDIUM_URL).then((res) => res.arrayBuffer()),
-    fetch(FONT_REGULAR_URL).then((res) => res.arrayBuffer()),
+    fetch(FONT_MEDIUM_URL).then((r) => r.arrayBuffer()),
+    fetch(FONT_REGULAR_URL).then((r) => r.arrayBuffer()),
   ]);
 
   const [year, month, day] = birthday.split("-").map(Number);
@@ -50,7 +43,7 @@ export default async function handler(req) {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const dateStr = `${monthNames[birthDate.getMonth()]} ${birthDate.getDate()}, ${nextBirthday.getFullYear()}`;
 
-  // Snake grid params (in CSS pixels, will be scaled to 1170x2532)
+  // Snake grid params
   const seg = 8;
   const gap = 2.3;
   const step = seg + gap;
@@ -97,108 +90,105 @@ export default async function handler(req) {
     backgroundColor: i < elapsed ? "#E8593C" : "#e0dbd4",
   }));
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#f5f2ed",
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          fontFamily: "Mono",
-        }}
-      >
-        {/* Snake blocks — wrapped so Satori treats them as one layer */}
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex" }}>
-          {blocks.map((style, i) => (
-            <div key={i} style={style} />
-          ))}
-        </div>
-
-        {/* Bottom text */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 50,
-            left: 0,
-            right: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 28,
-              fontWeight: 500,
-              color: "#1a1a1a",
-              fontFamily: "Mono",
-              display: "flex",
-            }}
-          >
-            {String(remaining)}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 400,
-              color: "#999999",
-              marginTop: 4,
-              fontFamily: "Mono",
-              display: "flex",
-            }}
-          >
-            days to go
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 400,
-              color: "#bbbbbb",
-              marginTop: 6,
-              fontFamily: "Mono",
-              display: "flex",
-            }}
-          >
-            {String(pct)}%
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 400,
-              color: "#cccccc",
-              marginTop: 6,
-              fontFamily: "Mono",
-              display: "flex",
-            }}
-          >
-            {dateStr}
-          </div>
-        </div>
-      </div>
-    ),
-    {
-      width: 1170,
-      height: 2532,
-      fonts: [
+  const jsx = {
+    type: "div",
+    props: {
+      style: {
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#f5f2ed",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        fontFamily: "Mono",
+      },
+      children: [
+        // Snake blocks wrapper
         {
-          name: "Mono",
-          data: monoMediumData,
-          weight: 500,
-          style: "normal",
+          type: "div",
+          props: {
+            style: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex" },
+            children: blocks.map((style) => ({
+              type: "div",
+              props: { style },
+            })),
+          },
         },
+        // Bottom text
         {
-          name: "Mono",
-          data: monoRegularData,
-          weight: 400,
-          style: "normal",
+          type: "div",
+          props: {
+            style: {
+              position: "absolute",
+              bottom: 50,
+              left: 0,
+              right: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: { fontSize: 28, fontWeight: 500, color: "#1a1a1a", fontFamily: "Mono", display: "flex" },
+                  children: String(remaining),
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: { fontSize: 12, fontWeight: 400, color: "#999999", marginTop: 4, fontFamily: "Mono", display: "flex" },
+                  children: "days to go",
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: { fontSize: 11, fontWeight: 400, color: "#bbbbbb", marginTop: 6, fontFamily: "Mono", display: "flex" },
+                  children: String(pct) + "%",
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: { fontSize: 9, fontWeight: 400, color: "#cccccc", marginTop: 6, fontFamily: "Mono", display: "flex" },
+                  children: dateStr,
+                },
+              },
+            ],
+          },
         },
       ],
-      headers: {
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+    },
+  };
+
+  const svg = await satori(jsx, {
+    width: 1170,
+    height: 2532,
+    fonts: [
+      {
+        name: "Mono",
+        data: Buffer.from(monoMediumData),
+        weight: 500,
+        style: "normal",
       },
-    }
-  );
+      {
+        name: "Mono",
+        data: Buffer.from(monoRegularData),
+        weight: 400,
+        style: "normal",
+      },
+    ],
+  });
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1170 },
+  });
+  const pngData = resvg.render();
+  const pngBuffer = pngData.asPng();
+
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=3600");
+  return res.send(pngBuffer);
 }
